@@ -3,6 +3,7 @@ package elisaraeli.travelers_notebook_valley_backend.security;
 
 import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.UnauthorizedException;
+import elisaraeli.travelers_notebook_valley_backend.services.UtenteService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

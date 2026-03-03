@@ -46,10 +46,13 @@ public class Utente implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UtenteRuolo ruolo = UtenteRuolo.USER;
 
-    public Utente(String username, String email, String password) {
+    public Utente(String username, String email, String password, UtenteRuolo ruolo) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.ruolo = ruolo;
+
+
         // Avatar di default con l'username dell'utente
         // per evitare caratteri speciali e cose del genere, lo trasformo prima nello standard UTF8
         // l'avatar si potrà poi cambiare modificando il profilo

@@ -1,7 +1,8 @@
 package elisaraeli.travelers_notebook_valley_backend.security;
 
-import com.team6.EpicEnergyService.entities.Utente;
-import com.team6.EpicEnergyService.exceptions.UnauthorizedException;
+
+import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
+import elisaraeli.travelers_notebook_valley_backend.exceptions.UnauthorizedException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +31,7 @@ public class JWTTools {
         try {
             Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parse(token);
         } catch (Exception ex) {
-            throw new UnauthorizedException("Qualcosa non ha funzionato, prova di nuovo.");
+            throw new UnauthorizedException("Ops, qualcosa non ha funzionato, prova di nuovo.");
         }
     }
 
@@ -38,7 +39,7 @@ public class JWTTools {
         try {
             return UUID.fromString(Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secret.getBytes())).build().parseSignedClaims(token).getPayload().getSubject());
         } catch (Exception ex) {
-            throw new UnauthorizedException("Qualcosa non ha funzionato, prova di nuovo.");
+            throw new UnauthorizedException("Ops, qualcosa non ha funzionato, prova di nuovo.");
         }
     }
 }
