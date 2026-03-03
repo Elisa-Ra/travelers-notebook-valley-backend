@@ -40,6 +40,7 @@ public class Utente implements UserDetails {
 
     private String avatar;
 
+    @Column(nullable = false, name = "data_registrazione")
     private LocalDate dataRegistrazione = LocalDate.now();
 
     @Enumerated(EnumType.STRING)
