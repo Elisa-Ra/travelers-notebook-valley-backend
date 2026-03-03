@@ -20,7 +20,7 @@ public class Conferita {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "data_conferimento")
     private LocalDate dataConferimento = LocalDate.now();
 
     @ManyToOne
