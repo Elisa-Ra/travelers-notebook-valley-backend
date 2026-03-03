@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+// SOLO L'ADMIN POTRA' FARE IL CRUD DEI MONUMENTI
 @Service
 public class MonumentoService {
 
@@ -21,11 +22,13 @@ public class MonumentoService {
         this.categoriaService = categoriaService;
     }
 
+    // CERCO IL MONUMENTO PER ID
     public Monumento findById(UUID id) {
         return monumentoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id));
     }
 
+    // CREO IL MONUMENTO
     public MonumentoResponse create(MonumentoDTO body) {
 
         Categoria categoria = categoriaService.findById(body.idCategoria());
@@ -49,4 +52,36 @@ public class MonumentoService {
                 categoria.getId()
         );
     }
+
+    // MODIFICO IL MONUMENTO
+    public MonumentoResponse update(UUID id, MonumentoDTO body) {
+        Monumento m = this.findById(id);
+        Categoria categoria = categoriaService.findById(body.idCategoria());
+
+        m.setNome(body.nome());
+        m.setDescrizione(body.descrizione());
+        m.setFoto(body.foto());
+        m.setPosizione(body.posizione());
+        m.setCategoria(categoria);
+
+        monumentoRepository.save(m);
+
+        return new MonumentoResponse(
+                m.getId(),
+                m.getNome(),
+                m.getDescrizione(),
+                m.getFoto(),
+                m.getPosizione(),
+                categoria.getId()
+
+        );
+    }
+
+    // CANCELLO IL MONUMENTO
+    public void delete(UUID id) {
+        Monumento m = this.findById(id);
+        monumentoRepository.delete(m);
+    }
+
+
 }

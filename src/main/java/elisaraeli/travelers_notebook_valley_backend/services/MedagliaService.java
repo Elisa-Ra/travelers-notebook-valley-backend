@@ -18,11 +18,13 @@ public class MedagliaService {
         this.medagliaRepository = medagliaRepository;
     }
 
+    // CERCO LA MEDAGLIA PER ID
     public Medaglia findById(UUID id) {
         return medagliaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id));
     }
 
+    // CREO LA MEDAGLIA
     public MedagliaResponse create(MedagliaDTO body) {
 
         Medaglia m = new Medaglia(
@@ -40,4 +42,25 @@ public class MedagliaService {
                 m.getIcona()
         );
     }
+
+    // MODIFICO LA MEDAGLIA
+    public MedagliaResponse update(UUID id, MedagliaDTO body) {
+        // cerco la medaglia per id
+        Medaglia m = this.findById(id);
+        // la modifico
+        m.setNome(body.nome());
+        m.setDescrizione(body.descrizione());
+        m.setIcona(body.icona());
+
+        // salvo
+        medagliaRepository.save(m);
+        return new MedagliaResponse(m.getId(), m.getNome(), m.getDescrizione(), m.getIcona());
+    }
+
+    // ELIMINO LA MEDAGLIA
+    public void delete(UUID id) {
+        Medaglia m = this.findById(id);
+        medagliaRepository.delete(m);
+    }
+
 }

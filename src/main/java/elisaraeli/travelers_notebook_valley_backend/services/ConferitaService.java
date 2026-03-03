@@ -3,11 +3,15 @@ package elisaraeli.travelers_notebook_valley_backend.services;
 import elisaraeli.travelers_notebook_valley_backend.entities.Conferita;
 import elisaraeli.travelers_notebook_valley_backend.entities.Medaglia;
 import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
+import elisaraeli.travelers_notebook_valley_backend.exceptions.NotFoundException;
 import elisaraeli.travelers_notebook_valley_backend.payloads.ConferitaDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.ConferitaResponse;
 import elisaraeli.travelers_notebook_valley_backend.repositories.ConferitaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
+// SOLO L'ADMIN USA IL SERVICE DI CONFERITA (Solo l'admin può conferire medaglie)
 @Service
 public class ConferitaService {
 
@@ -21,6 +25,7 @@ public class ConferitaService {
         this.utenteService = utenteService;
     }
 
+    // CREO LA MEDAGLIA
     public ConferitaResponse assegnaMedaglia(ConferitaDTO body) {
 
         Medaglia medaglia = medagliaService.findById(body.idMedaglia());
@@ -36,4 +41,18 @@ public class ConferitaService {
                 utente.getId()
         );
     }
+
+    // PRENDO LA MEDAGLIA PER ID
+    public ConferitaResponse getById(UUID id) {
+        Conferita c = conferitaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(id));
+
+        return new ConferitaResponse(
+                c.getId(),
+                c.getDataConferimento(),
+                c.getUtente().getId(),
+                c.getMedaglia().getId()
+        );
+    }
+
 }

@@ -4,6 +4,7 @@ import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
 import elisaraeli.travelers_notebook_valley_backend.entities.UtenteRuolo;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.BadRequestException;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.NotFoundException;
+import elisaraeli.travelers_notebook_valley_backend.payloads.AdminDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.UtenteResponse;
 import elisaraeli.travelers_notebook_valley_backend.payloads.UtentiDTO;
 import elisaraeli.travelers_notebook_valley_backend.repositories.UtenteRepository;
@@ -40,7 +41,7 @@ public class UtenteService {
                 .orElseThrow(() -> new NotFoundException("L'utente con questo username non è stato trovato."));
     }
 
-    public UtenteResponse register(UtentiDTO payload) {
+    public UtenteResponse saveUtente(UtentiDTO payload) {
 
         // Controllo che la mail non esista già
         if (utenteRepository.findByEmail(payload.email()).isPresent()) {
@@ -71,4 +72,19 @@ public class UtenteService {
                 nuovoUtente.getRuolo()
         );
     }
+
+    // SOLO PER CREARE L'ADMIN
+    public Utente createAdmin(AdminDTO body) {
+
+        Utente admin = new Utente(
+                body.username(),
+                body.email(),
+                passwordEncoder.encode(body.password())
+        );
+
+        admin.setRuolo(UtenteRuolo.ADMIN);
+
+        return utenteRepository.save(admin);
+    }
+
 }

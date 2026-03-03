@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+// SOLO L'ADMIN POTRA' FARE IL CRUD DI CATEGORIA
 @Service
 public class CategoriaService {
 
@@ -18,11 +19,13 @@ public class CategoriaService {
         this.categoriaRepository = categoriaRepository;
     }
 
+    // CERCO UNA CATEGORIA PER ID
     public Categoria findById(UUID id) {
         return categoriaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id));
     }
 
+    // CREO UNA CATEGORIA
     public CategoriaResponse create(CategoriaDTO body) {
 
         Categoria c = new Categoria(body.categoria());
@@ -33,4 +36,19 @@ public class CategoriaService {
                 c.getCategoria()
         );
     }
+
+    // MODIFICO LA CATEGORIA
+    public CategoriaResponse update(UUID id, CategoriaDTO body) {
+        Categoria c = this.findById(id);
+        c.setCategoria(body.categoria());
+        categoriaRepository.save(c);
+        return new CategoriaResponse(c.getId(), c.getCategoria());
+    }
+
+    // ELIMINO LA CATEGORIA
+    public void delete(UUID id) {
+        Categoria c = this.findById(id);
+        categoriaRepository.delete(c);
+    }
+
 }
