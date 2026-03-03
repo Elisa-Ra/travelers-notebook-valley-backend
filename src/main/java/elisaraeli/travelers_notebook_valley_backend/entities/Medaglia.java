@@ -9,11 +9,12 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "monumenti")
 @NoArgsConstructor
 @Getter
 @Setter
-public class Monumento {
+@Table(name = "medaglie")
+public class Medaglia {
+
     @Id
     @GeneratedValue
     @Setter(AccessLevel.NONE)
@@ -22,25 +23,15 @@ public class Monumento {
     @Column(nullable = false, unique = true)
     private String nome;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false)
     private String descrizione;
 
     @Column(nullable = false)
-    private String foto;
+    private String icona;
 
-    @Column(nullable = false)
-    private String posizione;
-
-    @ManyToOne
-    @JoinColumn(name = "categoria", nullable = false)
-    private Categoria categoria;
-
-
-    public Monumento(String nome, String descrizione, String foto, String posizione, Categoria categoria) {
+    public Medaglia(String nome, String descrizione, String icona) {
         this.nome = nome;
         this.descrizione = descrizione;
-        this.foto = foto;
-        this.posizione = posizione;
-        this.categoria = categoria;
+        this.icona = icona;
     }
 }
