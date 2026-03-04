@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -118,7 +119,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    // GET ALL
+    // GET ALL con paginazione
     public Page<PostResponse> getAll(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
@@ -133,5 +134,28 @@ public class PostService {
                         post.getUtente().getId()
                 ));
     }
+
+    // Cerco un post per id del monumento
+    public List<Post> findByMonumentoId(UUID idMonumento) {
+        return postRepository.findByMonumentoId(idMonumento);
+    }
+
+    // Prendo i post dell'utente
+    public List<PostResponse> getByUtente(UUID idUtente) {
+        return postRepository.findByUtenteId(idUtente)
+                .stream()
+                .map(post -> new PostResponse(
+                        post.getId(),
+                        post.getTitolo(),
+                        post.getContenuto(),
+                        post.getDataCreazione(),
+                        post.getDataModifica(),
+                        post.getMonumento().getId(),
+                        post.getUtente().getId()
+                ))
+                .toList();
+    }
+
+
 }
 

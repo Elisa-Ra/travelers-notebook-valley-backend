@@ -6,6 +6,7 @@ import elisaraeli.travelers_notebook_valley_backend.exceptions.BadRequestExcepti
 import elisaraeli.travelers_notebook_valley_backend.payloads.PostDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.PostResponse;
 import elisaraeli.travelers_notebook_valley_backend.services.PostService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,6 +50,17 @@ public class PostController {
                 p.getMonumento().getId(), p.getUtente().getId()
         );
     }
+
+    // paginazione dei post
+    @GetMapping
+    public Page<PostResponse> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "dataCreazione") String sortBy
+    ) {
+        return postService.getAll(page, size, sortBy);
+    }
+
 
     // modifico il post
     @PutMapping("/{id}")

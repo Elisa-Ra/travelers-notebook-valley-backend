@@ -37,11 +37,11 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
         String accessToken = authHeader.replace("Bearer ", "");
         jwtTools.verifyToken(accessToken);
 
-        // verify authorization
+        // verifica l'autorizzazione
         Utente authUtente = this.utenteService.findById(jwtTools.getId(accessToken));
         Authentication authentication = new UsernamePasswordAuthenticationToken(authUtente, null, authUtente.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        //*************************************
+
         filterChain.doFilter(request, response);
     }
 

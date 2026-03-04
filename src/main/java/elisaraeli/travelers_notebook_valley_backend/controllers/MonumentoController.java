@@ -4,6 +4,7 @@ import elisaraeli.travelers_notebook_valley_backend.entities.Monumento;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.BadRequestException;
 import elisaraeli.travelers_notebook_valley_backend.payloads.MonumentoDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.MonumentoResponse;
+import elisaraeli.travelers_notebook_valley_backend.payloads.PostResponse;
 import elisaraeli.travelers_notebook_valley_backend.services.MonumentoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 // Solo l'ADMIN può fare il crud dei monumenti
@@ -46,6 +48,13 @@ public class MonumentoController {
                 m.getFoto(), m.getPosizione(), m.getCategoria().getId()
         );
     }
+
+    @GetMapping("/monumento/{id}")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    public List<PostResponse> getByMonumento(@PathVariable UUID id) {
+        return monumentoService.getByMonumento(id);
+    }
+
 
     // modifico il monumento
     @PutMapping("/{id}")

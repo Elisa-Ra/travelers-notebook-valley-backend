@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -128,6 +129,21 @@ public class FotoService {
         }
 
         fotoRepository.delete(foto);
+    }
+
+    // recupero le foto di un post
+    public List<FotoResponse> getByPost(UUID idPost) {
+        Post post = postService.findById(idPost);
+
+        return fotoRepository.findByPostId(idPost)
+                .stream()
+                .map(f -> new FotoResponse(
+                        f.getId(),
+                        f.getUrl(),
+                        f.getDescrizione(),
+                        f.getDataCaricamento()
+                ))
+                .toList();
     }
 
 }

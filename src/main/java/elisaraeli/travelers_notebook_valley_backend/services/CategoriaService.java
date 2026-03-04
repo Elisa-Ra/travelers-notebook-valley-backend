@@ -1,6 +1,7 @@
 package elisaraeli.travelers_notebook_valley_backend.services;
 
 import elisaraeli.travelers_notebook_valley_backend.entities.Categoria;
+import elisaraeli.travelers_notebook_valley_backend.exceptions.BadRequestException;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.NotFoundException;
 import elisaraeli.travelers_notebook_valley_backend.payloads.CategoriaDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.CategoriaResponse;
@@ -28,14 +29,21 @@ public class CategoriaService {
     // CREO UNA CATEGORIA
     public CategoriaResponse create(CategoriaDTO body) {
 
-        Categoria c = new Categoria(body.categoria());
-        categoriaRepository.save(c);
+        // Aggiungo un controllo per vedere se la categoria è già presente
+        categoriaRepository.findByCategoria(body.categoria())
+                .ifPresent(c -> {
+                    throw new BadRequestException("La categoria '" + body.categoria() + "' esiste già.");
+                });
+
+        Categoria nuova = new Categoria(body.categoria());
+        categoriaRepository.save(nuova);
 
         return new CategoriaResponse(
-                c.getId(),
-                c.getCategoria()
+                nuova.getId(),
+                nuova.getCategoria()
         );
     }
+
 
     // MODIFICO LA CATEGORIA
     public CategoriaResponse update(UUID id, CategoriaDTO body) {

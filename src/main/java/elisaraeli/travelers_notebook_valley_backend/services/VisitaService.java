@@ -9,6 +9,7 @@ import elisaraeli.travelers_notebook_valley_backend.payloads.VisitaResponse;
 import elisaraeli.travelers_notebook_valley_backend.repositories.VisitaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 // L'utente può creare le visite
@@ -53,6 +54,19 @@ public class VisitaService {
                 v.getMonumento().getId(),
                 v.getUtente().getId()
         );
+    }
+
+    // Prendo le visite dell'utente tramite il suo id
+    public List<VisitaResponse> getByUtente(UUID idUtente) {
+        return visitaRepository.findByUtenteId(idUtente)
+                .stream()
+                .map(v -> new VisitaResponse(
+                        v.getId(),
+                        v.getDataVisita(),
+                        v.getMonumento().getId(),
+                        v.getUtente().getId()
+                ))
+                .toList();
     }
 
 }
