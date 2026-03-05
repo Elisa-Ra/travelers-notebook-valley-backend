@@ -6,11 +6,9 @@ import elisaraeli.travelers_notebook_valley_backend.exceptions.BadRequestExcepti
 import elisaraeli.travelers_notebook_valley_backend.exceptions.NotFoundException;
 import elisaraeli.travelers_notebook_valley_backend.payloads.MonumentoDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.MonumentoResponse;
-import elisaraeli.travelers_notebook_valley_backend.payloads.PostResponse;
 import elisaraeli.travelers_notebook_valley_backend.repositories.MonumentoRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 // SOLO L'ADMIN POTRA' FARE IL CRUD DEI MONUMENTI
@@ -19,12 +17,12 @@ public class MonumentoService {
 
     private final MonumentoRepository monumentoRepository;
     private final CategoriaService categoriaService;
-    private final PostService postService;
 
-    public MonumentoService(MonumentoRepository monumentoRepository, CategoriaService categoriaService, PostService postService) {
+
+    public MonumentoService(MonumentoRepository monumentoRepository, CategoriaService categoriaService) {
         this.monumentoRepository = monumentoRepository;
         this.categoriaService = categoriaService;
-        this.postService = postService;
+
     }
 
     // CERCO IL MONUMENTO PER ID
@@ -96,21 +94,5 @@ public class MonumentoService {
         Monumento m = this.findById(id);
         monumentoRepository.delete(m);
     }
-
-    public List<PostResponse> getByMonumento(UUID idMonumento) {
-        return postService.findByMonumentoId(idMonumento)
-                .stream()
-                .map(post -> new PostResponse(
-                        post.getId(),
-                        post.getTitolo(),
-                        post.getContenuto(),
-                        post.getDataCreazione(),
-                        post.getDataModifica(),
-                        post.getMonumento().getId(),
-                        post.getUtente().getId()
-                ))
-                .toList();
-    }
-
 
 }

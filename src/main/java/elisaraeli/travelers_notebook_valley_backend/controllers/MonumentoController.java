@@ -6,6 +6,7 @@ import elisaraeli.travelers_notebook_valley_backend.payloads.MonumentoDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.MonumentoResponse;
 import elisaraeli.travelers_notebook_valley_backend.payloads.PostResponse;
 import elisaraeli.travelers_notebook_valley_backend.services.MonumentoService;
+import elisaraeli.travelers_notebook_valley_backend.services.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -17,13 +18,15 @@ import java.util.UUID;
 
 // Solo l'ADMIN può fare il crud dei monumenti
 @RestController
-@RequestMapping("/monumenti")
+@RequestMapping("/monumento")
 public class MonumentoController {
 
     private final MonumentoService monumentoService;
+    private final PostService postService;
 
-    public MonumentoController(MonumentoService monumentoService) {
+    public MonumentoController(MonumentoService monumentoService, PostService postService) {
         this.monumentoService = monumentoService;
+        this.postService = postService;
     }
 
     // creo il monumento
@@ -49,10 +52,10 @@ public class MonumentoController {
         );
     }
 
-    @GetMapping("/monumento/{id}")
+    @GetMapping("/{id}/posts")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public List<PostResponse> getByMonumento(@PathVariable UUID id) {
-        return monumentoService.getByMonumento(id);
+        return postService.getByMonumento(id);
     }
 
 

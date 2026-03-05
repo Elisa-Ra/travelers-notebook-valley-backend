@@ -156,6 +156,20 @@ public class PostService {
                 .toList();
     }
 
+    public List<PostResponse> getByMonumento(UUID idMonumento) {
+        return postRepository.findByMonumentoId(idMonumento)
+                .stream()
+                .map(post -> new PostResponse(
+                        post.getId(),
+                        post.getTitolo(),
+                        post.getContenuto(),
+                        post.getDataCreazione(),
+                        post.getDataModifica(),
+                        post.getMonumento().getId(),
+                        post.getUtente().getId()
+                ))
+                .toList();
+    }
 
 }
 
