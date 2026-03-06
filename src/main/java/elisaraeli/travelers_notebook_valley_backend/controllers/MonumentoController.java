@@ -8,10 +8,12 @@ import elisaraeli.travelers_notebook_valley_backend.payloads.PostResponse;
 import elisaraeli.travelers_notebook_valley_backend.services.MonumentoService;
 import elisaraeli.travelers_notebook_valley_backend.services.PostService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -41,14 +43,14 @@ public class MonumentoController {
         return monumentoService.create(body);
     }
 
+    // GET DEI MONUMENTI
     // cerco il monumento per id
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public MonumentoResponse getById(@PathVariable UUID id) {
         Monumento m = monumentoService.findById(id);
         return new MonumentoResponse(
                 m.getId(), m.getNome(), m.getDescrizione(),
-                m.getFoto(), m.getPosizione(), m.getCategoria().getId()
+                m.getFoto(), m.getPosizione(), m.getCategoria().getCategoria()
         );
     }
 
@@ -56,6 +58,11 @@ public class MonumentoController {
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public List<PostResponse> getByMonumento(@PathVariable UUID id) {
         return postService.getByMonumento(id);
+    }
+
+    @GetMapping
+    public List<MonumentoResponse> getAll() {
+        return monumentoService.getAll();
     }
 
 
@@ -78,5 +85,16 @@ public class MonumentoController {
     public void delete(@PathVariable UUID id) {
         monumentoService.delete(id);
     }
+
+    @PostMapping(value = "/{id}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public MonumentoResponse uploadFoto(
+            @PathVariable UUID id,
+            @RequestPart("file") MultipartFile file
+    ) {
+        return monumentoService.uploadFoto(id, file);
+    }
+
 }
 

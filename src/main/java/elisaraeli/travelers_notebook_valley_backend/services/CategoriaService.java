@@ -59,4 +59,9 @@ public class CategoriaService {
         categoriaRepository.delete(c);
     }
 
+    public Categoria findByNome(String nome) {
+        return categoriaRepository.findByCategoria(nome)
+                .orElseThrow(() -> new NotFoundException("Categoria non trovata: " + nome));
+    }
+
 }

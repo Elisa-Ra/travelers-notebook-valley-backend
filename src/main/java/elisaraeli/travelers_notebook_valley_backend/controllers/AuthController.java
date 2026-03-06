@@ -1,6 +1,7 @@
 package elisaraeli.travelers_notebook_valley_backend.controllers;
 
 
+import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.ValidationException;
 import elisaraeli.travelers_notebook_valley_backend.payloads.LoginDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.LoginResponse;
@@ -11,6 +12,7 @@ import elisaraeli.travelers_notebook_valley_backend.services.UtenteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +50,18 @@ public class AuthController {
         } else {
             return this.utenteService.saveUtente(payload);
         }
+    }
+
+    @GetMapping("/me")
+    public UtenteResponse me(@AuthenticationPrincipal Utente utente) {
+        return new UtenteResponse(
+                utente.getId(),
+                utente.getUsername(),
+                utente.getEmail(),
+                utente.getAvatar(),
+                utente.getDataRegistrazione(),
+                utente.getRuolo()
+        );
     }
 
 

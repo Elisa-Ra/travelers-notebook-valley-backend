@@ -8,7 +8,8 @@ public record MonumentoResponse(
         String descrizione,
         String foto,
         String posizione,
-        UUID idCategoria
+        String nomeCategoria
+
 
 ) {
 }

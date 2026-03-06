@@ -25,7 +25,7 @@ public class Monumento {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String descrizione;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String foto;
 
     @Column(nullable = false)

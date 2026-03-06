@@ -2,7 +2,6 @@ package elisaraeli.travelers_notebook_valley_backend.security;
 
 
 import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
-import elisaraeli.travelers_notebook_valley_backend.exceptions.UnauthorizedException;
 import elisaraeli.travelers_notebook_valley_backend.services.UtenteService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,9 +30,18 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer "))
-            throw new UnauthorizedException("La chiave d'accesso non è valida.");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String accessToken = authHeader.replace("Bearer ", "");
         jwtTools.verifyToken(accessToken);
 
@@ -47,6 +55,8 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return new AntPathMatcher().match("/auth/**", request.getServletPath());
+        return new AntPathMatcher().match("/auth/login", request.getServletPath())
+                || new AntPathMatcher().match("/auth/register", request.getServletPath());
+
     }
 }

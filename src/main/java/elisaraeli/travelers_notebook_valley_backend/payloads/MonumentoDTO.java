@@ -1,9 +1,8 @@
 package elisaraeli.travelers_notebook_valley_backend.payloads;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
 
 // creazione e modifica del monumento (potrà farlo solo l'admin)
 public record MonumentoDTO(
@@ -13,14 +12,14 @@ public record MonumentoDTO(
         @NotBlank(message = "La descrizione è obbligatoria.")
         String descrizione,
 
-        @NotBlank(message = "La foto è obbligatoria.")
+        @Nullable
         String foto,
 
         @NotBlank(message = "La posizione è obbligatoria.")
         String posizione,
 
         @NotNull(message = "La categoria è obbligatoria.")
-        UUID idCategoria
+        String nomeCategoria
 
 ) {
 }
