@@ -8,6 +8,7 @@ import elisaraeli.travelers_notebook_valley_backend.payloads.CategoriaResponse;
 import elisaraeli.travelers_notebook_valley_backend.repositories.CategoriaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 // SOLO L'ADMIN POTRA' FARE IL CRUD DI CATEGORIA
@@ -24,6 +25,13 @@ public class CategoriaService {
     public Categoria findById(UUID id) {
         return categoriaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(id));
+    }
+
+    public List<CategoriaResponse> getAll() {
+        return categoriaRepository.findAll()
+                .stream()
+                .map(c -> new CategoriaResponse(c.getId(), c.getCategoria()))
+                .toList();
     }
 
     // CREO UNA CATEGORIA

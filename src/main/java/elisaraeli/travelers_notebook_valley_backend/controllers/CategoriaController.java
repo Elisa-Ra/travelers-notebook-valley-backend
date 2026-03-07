@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -39,6 +40,12 @@ public class CategoriaController {
     public CategoriaResponse getById(@PathVariable UUID id) {
         Categoria c = categoriaService.findById(id);
         return new CategoriaResponse(c.getId(), c.getCategoria());
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    public List<CategoriaResponse> getAll() {
+        return categoriaService.getAll();
     }
 
     @PutMapping("/{id}")
