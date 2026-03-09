@@ -4,11 +4,9 @@ import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
 import elisaraeli.travelers_notebook_valley_backend.payloads.MedagliaResponse;
 import elisaraeli.travelers_notebook_valley_backend.payloads.PostResponse;
 import elisaraeli.travelers_notebook_valley_backend.payloads.UtenteResponse;
-import elisaraeli.travelers_notebook_valley_backend.payloads.VisitaResponse;
 import elisaraeli.travelers_notebook_valley_backend.services.ConferitaService;
 import elisaraeli.travelers_notebook_valley_backend.services.PostService;
 import elisaraeli.travelers_notebook_valley_backend.services.UtenteService;
-import elisaraeli.travelers_notebook_valley_backend.services.VisitaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,19 +21,16 @@ public class UtenteController {
 
     private final UtenteService utenteService;
     private final PostService postService;
-    private final VisitaService visitaService;
     private final ConferitaService conferitaService;
 
 
     public UtenteController(
             UtenteService utenteService,
             PostService postService,
-            VisitaService visitaService,
             ConferitaService conferitaService
     ) {
         this.utenteService = utenteService;
         this.postService = postService;
-        this.visitaService = visitaService;
         this.conferitaService = conferitaService;
     }
 
@@ -73,13 +68,6 @@ public class UtenteController {
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public List<PostResponse> getMyPosts(@AuthenticationPrincipal Utente utente) {
         return postService.getByUtente(utente.getId());
-    }
-
-    // Recupero le visite dell'utente loggato
-    @GetMapping("/me/visite")
-    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public List<VisitaResponse> getMyVisite(@AuthenticationPrincipal Utente utente) {
-        return visitaService.getByUtente(utente.getId());
     }
 
     // Recupero le medaglie dell'utente loggato
