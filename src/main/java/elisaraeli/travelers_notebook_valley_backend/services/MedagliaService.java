@@ -1,5 +1,7 @@
 package elisaraeli.travelers_notebook_valley_backend.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import elisaraeli.travelers_notebook_valley_backend.entities.Medaglia;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.BadRequestException;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.NotFoundException;
@@ -8,8 +10,11 @@ import elisaraeli.travelers_notebook_valley_backend.payloads.MedagliaResponse;
 import elisaraeli.travelers_notebook_valley_backend.repositories.ConferitaRepository;
 import elisaraeli.travelers_notebook_valley_backend.repositories.MedagliaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -17,11 +22,14 @@ public class MedagliaService {
 
     private final MedagliaRepository medagliaRepository;
     private final ConferitaRepository conferitaRepository;
+    private final Cloudinary cloudinary;
 
-
-    public MedagliaService(MedagliaRepository medagliaRepository, ConferitaRepository conferitaRepository) {
+    public MedagliaService(MedagliaRepository medagliaRepository, ConferitaRepository conferitaRepository, Cloudinary cloudinary
+    ) {
         this.medagliaRepository = medagliaRepository;
         this.conferitaRepository = conferitaRepository;
+        this.cloudinary = cloudinary;
+
     }
 
     // CERCO LA MEDAGLIA PER ID
@@ -89,6 +97,49 @@ public class MedagliaService {
                         c.getMedaglia().getIcona()
                 ))
                 .toList();
+    }
+
+    public List<MedagliaResponse> getAll() {
+        return medagliaRepository.findAll()
+                .stream()
+                .map(m -> new MedagliaResponse(
+                        m.getId(),
+                        m.getNome(),
+                        m.getDescrizione(),
+                        m.getIcona()
+                ))
+                .toList();
+    }
+
+    // per caricare l'icona della medaglia
+    public MedagliaResponse uploadIcona(UUID id, MultipartFile file) {
+        Medaglia m = this.findById(id);
+
+        try {
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "folder", "medaglie",
+                            "public_id", "medaglia_" + id,
+                            "overwrite", true
+                    )
+            );
+
+            String url = uploadResult.get("secure_url").toString();
+
+            m.setIcona(url);
+            medagliaRepository.save(m);
+
+            return new MedagliaResponse(
+                    m.getId(),
+                    m.getNome(),
+                    m.getDescrizione(),
+                    m.getIcona()
+            );
+
+        } catch (IOException e) {
+            throw new RuntimeException("Errore upload icona", e);
+        }
     }
 
 

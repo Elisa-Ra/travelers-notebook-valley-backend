@@ -8,11 +8,13 @@ import elisaraeli.travelers_notebook_valley_backend.payloads.MedagliaResponse;
 import elisaraeli.travelers_notebook_valley_backend.services.ConferitaService;
 import elisaraeli.travelers_notebook_valley_backend.services.MedagliaService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +42,17 @@ public class MedagliaController {
         if (validation.hasErrors()) throw new BadRequestException(validation.getAllErrors());
         return medagliaService.create(body);
     }
+
+    // caricare l'icona della medaglia
+    @PostMapping(value = "/{id}/icona", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public MedagliaResponse uploadIcona(
+            @PathVariable UUID id,
+            @RequestPart("file") MultipartFile file
+    ) {
+        return medagliaService.uploadIcona(id, file);
+    }
+
 
     // cerco le medaglie per id
     @GetMapping("/{id}")
@@ -78,6 +91,12 @@ public class MedagliaController {
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public List<MedagliaResponse> getMyMedaglie(@AuthenticationPrincipal Utente utente) {
         return conferitaService.getMedaglieByUtente(utente.getId());
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<MedagliaResponse> getAll() {
+        return medagliaService.getAll();
     }
 
 }
