@@ -64,7 +64,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        // ⭐ ASSEGNO LA MEDAGLIA AUTOMATICAMENTE
+        // ASSEGNO LA MEDAGLIA AUTOMATICAMENTE
         medagliaRepository.findByMonumento_Id(monumento.getId())
                 .ifPresent(medaglia -> conferitaService.assegnaSeNonPresente(medaglia, autore));
 
