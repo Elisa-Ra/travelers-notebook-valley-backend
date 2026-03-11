@@ -70,4 +70,16 @@ public class ConferitaService {
                 .toList();
     }
 
+    // assegna la medaglia se non è già presente
+    public void assegnaSeNonPresente(Medaglia medaglia, Utente utente) {
+
+        boolean isConferita = conferitaRepository
+                .existsByUtenteIdAndMedagliaId(utente.getId(), medaglia.getId());
+
+        if (!isConferita) {
+            Conferita conferita = new Conferita(medaglia, utente);
+            conferitaRepository.save(conferita);
+        }
+    }
+
 }

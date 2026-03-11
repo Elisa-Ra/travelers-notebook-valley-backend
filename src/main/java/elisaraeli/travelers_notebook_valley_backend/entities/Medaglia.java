@@ -28,6 +28,10 @@ public class Medaglia {
 
     @Column(nullable = false)
     private String icona;
+    @OneToOne
+    @JoinColumn(name = "id_monumento")
+    private Monumento monumento;
+
 
     public Medaglia(String nome, String descrizione, String icona) {
         this.nome = nome;

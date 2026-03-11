@@ -11,6 +11,8 @@ public interface ConferitaRepository extends JpaRepository<Conferita, UUID> {
 
     List<Conferita> findByUtenteId(UUID idUtente);
 
-    List<Conferita> findByMedagliaId(UUID idMedaglia);
+    boolean existsByUtenteIdAndMedagliaId(UUID utenteId, UUID medagliaId);
+
+
 }
 

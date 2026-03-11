@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -85,5 +86,12 @@ public class PostController {
     ) {
         postService.delete(id, utente.getId());
     }
+    
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    public List<PostResponse> getMyPosts(@AuthenticationPrincipal Utente utente) {
+        return postService.getByUserId(utente.getId());
+    }
+
 }
 

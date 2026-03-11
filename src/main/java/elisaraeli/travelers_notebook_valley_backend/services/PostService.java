@@ -8,7 +8,7 @@ import elisaraeli.travelers_notebook_valley_backend.exceptions.BadRequestExcepti
 import elisaraeli.travelers_notebook_valley_backend.exceptions.NotFoundException;
 import elisaraeli.travelers_notebook_valley_backend.payloads.PostDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.PostResponse;
-import elisaraeli.travelers_notebook_valley_backend.repositories.PostRepository;
+import elisaraeli.travelers_notebook_valley_backend.repositories.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,39 +23,52 @@ import java.util.UUID;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final MonumentoService monumentoService;
-    private final UtenteService utenteService;
+    private final MonumentoRepository monumentoRepository;
+    private final UtenteRepository utenteRepository;
+    private final MedagliaRepository medagliaRepository;
+    private final ConferitaRepository conferitaRepository;
+    private final ConferitaService conferitaService;
 
-    public PostService(PostRepository postRepository, MonumentoService monumentoService, UtenteService utenteService) {
+    public PostService(
+            PostRepository postRepository,
+            MonumentoRepository monumentoRepository,
+            UtenteRepository utenteRepository,
+            MedagliaRepository medagliaRepository,
+            ConferitaRepository conferitaRepository,
+            ConferitaService conferitaService
+    ) {
         this.postRepository = postRepository;
-        this.monumentoService = monumentoService;
-        this.utenteService = utenteService;
+        this.monumentoRepository = monumentoRepository;
+        this.utenteRepository = utenteRepository;
+        this.medagliaRepository = medagliaRepository;
+        this.conferitaRepository = conferitaRepository;
+        this.conferitaService = conferitaService;
     }
 
     // CREO IL POST
-    public PostResponse create(PostDTO body, UUID idUtente) {
+    public PostResponse create(PostDTO body, UUID userId) {
 
-        Utente autore = utenteService.findById(idUtente);
-        Monumento monumento = monumentoService.findById(body.idMonumento());
+        Utente autore = utenteRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Utente non trovato"));
 
-        Post nuovo = new Post(
-                autore,
-                body.titolo(),
-                body.contenuto(),
-                monumento
-        );
+        Monumento monumento = monumentoRepository.findById(body.idMonumento())
+                .orElseThrow(() -> new NotFoundException("Monumento non trovato"));
 
-        postRepository.save(nuovo);
+        Post post = new Post();
+        post.setTitolo(body.titolo());
+        post.setContenuto(body.contenuto());
+        post.setDataCreazione(LocalDate.now());
+        post.setDataModifica(LocalDate.now());
+        post.setUtente(autore);
+        post.setMonumento(monumento);
 
-        return new PostResponse(
-                nuovo.getId(),
-                nuovo.getTitolo(),
-                nuovo.getContenuto(),
-                nuovo.getDataCreazione(),
-                nuovo.getDataModifica(),
-                monumento.getId(),
-                autore.getId()
-        );
+        postRepository.save(post);
+
+        // ⭐ ASSEGNO LA MEDAGLIA AUTOMATICAMENTE
+        medagliaRepository.findByMonumento_Id(monumento.getId())
+                .ifPresent(medaglia -> conferitaService.assegnaSeNonPresente(medaglia, autore));
+
+        return new PostResponse(post);
     }
 
     // trovo il post per ID
@@ -68,38 +81,26 @@ public class PostService {
     // i post possono essere modificati dall'autore del post
     public PostResponse update(UUID postId, PostDTO body, UUID idUtente) {
 
-        // prendo il post
         Post post = this.findById(postId);
-        Utente richiedente = utenteService.findById(idUtente);
 
-        // controllo che l'utente sia l'autore del post
-        boolean isAutore = post.getUtente().getId().equals(idUtente);
-
-
-        if (!isAutore) {
-            throw new BadRequestException("Non hai il permesso di modificare il post. Solo l'autore del post può modificarlo");
+        if (!post.getUtente().getId().equals(idUtente)) {
+            throw new BadRequestException("Non hai il permesso di modificare il post.");
         }
 
         // aggiorno i campi
         post.setTitolo(body.titolo());
         post.setContenuto(body.contenuto());
-        Monumento monumento = monumentoService.findById(body.idMonumento());
+
+        Monumento monumento = monumentoRepository.findById(body.idMonumento())
+                .orElseThrow(() -> new NotFoundException("Monumento non trovato"));
+
         post.setMonumento(monumento);
         post.setDataModifica(LocalDate.now());
 
         // salvo
         postRepository.save(post);
 
-        return new PostResponse(
-                post.getId(),
-                post.getTitolo(),
-                post.getContenuto(),
-                post.getDataCreazione(),
-                post.getDataModifica(),
-                monumento.getId(),
-                post.getUtente().getId()
-        );
-
+        return new PostResponse(post);
     }
 
     // CANCELLO UN POST
@@ -107,7 +108,9 @@ public class PostService {
     public void delete(UUID postId, UUID idUtente) {
 
         Post post = this.findById(postId);
-        Utente richiedente = utenteService.findById(idUtente);
+
+        Utente richiedente = utenteRepository.findById(idUtente)
+                .orElseThrow(() -> new NotFoundException("Utente non trovato"));
 
         boolean isAutore = post.getUtente().getId().equals(idUtente);
         boolean isAdmin = richiedente.getRuolo().equals(UtenteRuolo.ADMIN);
@@ -124,52 +127,22 @@ public class PostService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
         return postRepository.findAll(pageable)
-                .map(post -> new PostResponse(
-                        post.getId(),
-                        post.getTitolo(),
-                        post.getContenuto(),
-                        post.getDataCreazione(),
-                        post.getDataModifica(),
-                        post.getMonumento().getId(),
-                        post.getUtente().getId()
-                ));
+                .map(PostResponse::new);
     }
 
-    // Cerco un post per id del monumento
-    public List<Post> findByMonumentoId(UUID idMonumento) {
-        return postRepository.findByMonumentoId(idMonumento);
-    }
-
-    // Prendo i post dell'utente
-    public List<PostResponse> getByUtente(UUID idUtente) {
-        return postRepository.findByUtenteId(idUtente)
-                .stream()
-                .map(post -> new PostResponse(
-                        post.getId(),
-                        post.getTitolo(),
-                        post.getContenuto(),
-                        post.getDataCreazione(),
-                        post.getDataModifica(),
-                        post.getMonumento().getId(),
-                        post.getUtente().getId()
-                ))
-                .toList();
-    }
-
+    // POST PER MONUMENTO
     public List<PostResponse> getByMonumento(UUID idMonumento) {
         return postRepository.findByMonumentoId(idMonumento)
                 .stream()
-                .map(post -> new PostResponse(
-                        post.getId(),
-                        post.getTitolo(),
-                        post.getContenuto(),
-                        post.getDataCreazione(),
-                        post.getDataModifica(),
-                        post.getMonumento().getId(),
-                        post.getUtente().getId()
-                ))
+                .map(PostResponse::new)
                 .toList();
     }
 
+    // POST PER UTENTE
+    public List<PostResponse> getByUserId(UUID userId) {
+        return postRepository.findByUtenteId(userId)
+                .stream()
+                .map(PostResponse::new)
+                .toList();
+    }
 }
-

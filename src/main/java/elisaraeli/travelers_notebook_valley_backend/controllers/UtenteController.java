@@ -67,8 +67,9 @@ public class UtenteController {
     @GetMapping("/me/post")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public List<PostResponse> getMyPosts(@AuthenticationPrincipal Utente utente) {
-        return postService.getByUtente(utente.getId());
+        return postService.getByUserId(utente.getId());
     }
+
 
     // Recupero le medaglie dell'utente loggato
     @GetMapping("/me/medaglie")

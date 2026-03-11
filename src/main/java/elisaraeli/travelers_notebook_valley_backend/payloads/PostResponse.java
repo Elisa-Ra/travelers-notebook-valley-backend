@@ -1,5 +1,7 @@
 package elisaraeli.travelers_notebook_valley_backend.payloads;
 
+import elisaraeli.travelers_notebook_valley_backend.entities.Post;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -13,4 +15,16 @@ public record PostResponse(
         UUID idMonumento,
         UUID idUtente
 ) {
+    public PostResponse(Post p) {
+        this(
+                p.getId(),
+                p.getTitolo(),
+                p.getContenuto(),
+                p.getDataCreazione(),
+                p.getDataModifica(),
+                p.getMonumento().getId(),
+                p.getUtente().getId()
+        );
+    }
 }
+
