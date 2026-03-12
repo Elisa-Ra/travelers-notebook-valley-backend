@@ -11,5 +11,4 @@ public interface MedagliaRepository extends JpaRepository<Medaglia, UUID> {
 
     Optional<Medaglia> findByMonumento_Id(UUID idMonumento);
 
-
 }

@@ -2,13 +2,16 @@ package elisaraeli.travelers_notebook_valley_backend.services;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import elisaraeli.travelers_notebook_valley_backend.entities.Conferita;
 import elisaraeli.travelers_notebook_valley_backend.entities.Medaglia;
+import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.BadRequestException;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.NotFoundException;
 import elisaraeli.travelers_notebook_valley_backend.payloads.MedagliaDTO;
 import elisaraeli.travelers_notebook_valley_backend.payloads.MedagliaResponse;
 import elisaraeli.travelers_notebook_valley_backend.repositories.ConferitaRepository;
 import elisaraeli.travelers_notebook_valley_backend.repositories.MedagliaRepository;
+import elisaraeli.travelers_notebook_valley_backend.repositories.UtenteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,12 +26,16 @@ public class MedagliaService {
     private final MedagliaRepository medagliaRepository;
     private final ConferitaRepository conferitaRepository;
     private final Cloudinary cloudinary;
+    private final UtenteRepository utenteRepository;
 
-    public MedagliaService(MedagliaRepository medagliaRepository, ConferitaRepository conferitaRepository, Cloudinary cloudinary
+
+    public MedagliaService(MedagliaRepository medagliaRepository, ConferitaRepository conferitaRepository,
+                           Cloudinary cloudinary, UtenteRepository utenteRepository
     ) {
         this.medagliaRepository = medagliaRepository;
         this.conferitaRepository = conferitaRepository;
         this.cloudinary = cloudinary;
+        this.utenteRepository = utenteRepository;
 
     }
 
@@ -62,7 +69,8 @@ public class MedagliaService {
                 m.getId(),
                 m.getNome(),
                 m.getDescrizione(),
-                m.getIcona()
+                m.getIcona(),
+                null
         );
     }
 
@@ -77,7 +85,7 @@ public class MedagliaService {
 
         // salvo
         medagliaRepository.save(m);
-        return new MedagliaResponse(m.getId(), m.getNome(), m.getDescrizione(), m.getIcona());
+        return new MedagliaResponse(m.getId(), m.getNome(), m.getDescrizione(), m.getIcona(), null);
     }
 
     // ELIMINO LA MEDAGLIA
@@ -94,7 +102,8 @@ public class MedagliaService {
                         c.getMedaglia().getId(),
                         c.getMedaglia().getNome(),
                         c.getMedaglia().getDescrizione(),
-                        c.getMedaglia().getIcona()
+                        c.getMedaglia().getIcona(),
+                        c.getDataConferimento()
                 ))
                 .toList();
     }
@@ -106,7 +115,8 @@ public class MedagliaService {
                         m.getId(),
                         m.getNome(),
                         m.getDescrizione(),
-                        m.getIcona()
+                        m.getIcona(),
+                        null
                 ))
                 .toList();
     }
@@ -134,7 +144,8 @@ public class MedagliaService {
                     m.getId(),
                     m.getNome(),
                     m.getDescrizione(),
-                    m.getIcona()
+                    m.getIcona(),
+                    null
             );
 
         } catch (IOException e) {
@@ -142,5 +153,26 @@ public class MedagliaService {
         }
     }
 
+    // serve per assegnare la medaglia quando l'utente si registra
+    public void medagliaRegistrazione(UUID utenteId) {
+        Medaglia medaglia = medagliaRepository.findByNome("Benvenuto")
+                .orElseThrow(() -> new RuntimeException("Ops, la medaglia non è stata trovata. Controlla bene il nome."));
+
+        // controllo se l'utente ha già la medaglia
+        boolean isConferita = conferitaRepository
+                .existsByUtenteIdAndMedagliaId(utenteId, medaglia.getId());
+
+        if (!isConferita) {
+
+            // Recupero l’utente
+            Utente utente = utenteRepository.findById(utenteId)
+                    .orElseThrow(() -> new RuntimeException("Ops, l'utente non è stato trovato."));
+
+            // Assegno la medaglia all'utente
+            Conferita conferita = new Conferita(medaglia, utente);
+
+            conferitaRepository.save(conferita);
+        }
+    }
 
 }

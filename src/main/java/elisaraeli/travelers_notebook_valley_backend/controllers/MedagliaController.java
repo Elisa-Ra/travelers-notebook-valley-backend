@@ -63,7 +63,8 @@ public class MedagliaController {
                 m.getId(),
                 m.getNome(),
                 m.getDescrizione(),
-                m.getIcona()
+                m.getIcona(),
+                null
         );
     }
 

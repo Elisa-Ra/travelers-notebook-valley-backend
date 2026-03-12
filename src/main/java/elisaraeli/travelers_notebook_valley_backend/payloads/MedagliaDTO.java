@@ -1,6 +1,7 @@
 package elisaraeli.travelers_notebook_valley_backend.payloads;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record MedagliaDTO(
         @NotBlank(message = "Il nome della medaglia è obbligatorio.")
@@ -9,7 +10,7 @@ public record MedagliaDTO(
         @NotBlank(message = "La descrizione è obbligatoria.")
         String descrizione,
 
-        @NotBlank(message = "L'icona è obbligatoria.")
+        @NotNull
         String icona
 ) {
 }

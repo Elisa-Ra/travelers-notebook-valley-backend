@@ -21,11 +21,15 @@ public class UtenteService {
 
     private final UtenteRepository utenteRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MedagliaService medagliaService;
+
 
     @Autowired
-    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder passwordEncoder) {
+    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder passwordEncoder, MedagliaService medagliaService
+    ) {
         this.utenteRepository = utenteRepository;
         this.passwordEncoder = passwordEncoder;
+        this.medagliaService = medagliaService;
     }
 
     public Utente findById(UUID id) {
@@ -81,6 +85,9 @@ public class UtenteService {
         );
 
         utenteRepository.save(nuovoUtente);
+        // assegno la medaglia all'utente per essersi registrato
+        medagliaService.medagliaRegistrazione(nuovoUtente.getId());
+
 
         return new UtenteResponse(
                 nuovoUtente.getId(),

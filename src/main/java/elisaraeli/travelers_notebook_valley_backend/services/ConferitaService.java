@@ -65,7 +65,8 @@ public class ConferitaService {
                         c.getMedaglia().getId(),
                         c.getMedaglia().getNome(),
                         c.getMedaglia().getDescrizione(),
-                        c.getMedaglia().getIcona()
+                        c.getMedaglia().getIcona(),
+                        c.getDataConferimento()
                 ))
                 .toList();
     }
