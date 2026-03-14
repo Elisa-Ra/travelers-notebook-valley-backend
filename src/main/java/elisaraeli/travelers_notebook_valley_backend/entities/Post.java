@@ -40,6 +40,9 @@ public class Post {
     @JoinColumn(name = "id_monumento", nullable = false)
     private Monumento monumento;
 
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
     public Post(Utente utente, String titolo, String contenuto, Monumento monumento) {
         this.utente = utente;
         this.titolo = titolo;

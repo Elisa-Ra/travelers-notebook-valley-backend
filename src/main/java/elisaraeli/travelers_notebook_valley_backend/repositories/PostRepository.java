@@ -10,6 +10,6 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
     List<Post> findByMonumentoId(UUID idMonumento);
 
-    List<Post> findByUtenteId(UUID idUtente);
+    List<Post> findByUtenteIdOrderByDataCreazioneAsc(UUID id);
 
 }

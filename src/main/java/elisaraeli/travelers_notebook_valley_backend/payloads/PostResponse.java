@@ -13,7 +13,8 @@ public record PostResponse(
         LocalDate dataCreazione,
         LocalDate dataModifica,
         UUID idMonumento,
-        UUID idUtente
+        UUID idUtente,
+        String fotoUrl
 ) {
     public PostResponse(Post p) {
         this(
@@ -23,7 +24,8 @@ public record PostResponse(
                 p.getDataCreazione(),
                 p.getDataModifica(),
                 p.getMonumento().getId(),
-                p.getUtente().getId()
+                p.getUtente().getId(),
+                p.getFotoUrl()
         );
     }
 }

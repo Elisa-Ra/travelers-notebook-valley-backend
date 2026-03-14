@@ -1,5 +1,7 @@
 package elisaraeli.travelers_notebook_valley_backend.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import elisaraeli.travelers_notebook_valley_backend.entities.Monumento;
 import elisaraeli.travelers_notebook_valley_backend.entities.Post;
 import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
@@ -14,9 +16,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -28,6 +33,7 @@ public class PostService {
     private final MedagliaRepository medagliaRepository;
     private final ConferitaRepository conferitaRepository;
     private final ConferitaService conferitaService;
+    private final Cloudinary cloudinary;
 
     public PostService(
             PostRepository postRepository,
@@ -35,7 +41,8 @@ public class PostService {
             UtenteRepository utenteRepository,
             MedagliaRepository medagliaRepository,
             ConferitaRepository conferitaRepository,
-            ConferitaService conferitaService
+            ConferitaService conferitaService,
+            Cloudinary cloudinary
     ) {
         this.postRepository = postRepository;
         this.monumentoRepository = monumentoRepository;
@@ -43,6 +50,7 @@ public class PostService {
         this.medagliaRepository = medagliaRepository;
         this.conferitaRepository = conferitaRepository;
         this.conferitaService = conferitaService;
+        this.cloudinary = cloudinary;
     }
 
     // CREO IL POST
@@ -123,11 +131,9 @@ public class PostService {
     }
 
     // GET ALL con paginazione
-    public Page<PostResponse> getAll(int page, int size, String sortBy) {
+    public Page<Post> getAll(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-
-        return postRepository.findAll(pageable)
-                .map(PostResponse::new);
+        return postRepository.findAll(pageable);
     }
 
     // POST PER MONUMENTO
@@ -140,9 +146,31 @@ public class PostService {
 
     // POST PER UTENTE
     public List<PostResponse> getByUserId(UUID userId) {
-        return postRepository.findByUtenteId(userId)
+        return postRepository.findByUtenteIdOrderByDataCreazioneAsc(userId)
                 .stream()
                 .map(PostResponse::new)
                 .toList();
+    }
+
+    public PostResponse uploadFoto(UUID postId, MultipartFile file, UUID userId) {
+        try {
+            Post post = this.findById(postId);
+
+            // Solo l’autore può caricare la foto
+            if (!post.getUtente().getId().equals(userId)) {
+                throw new BadRequestException("Non puoi modificare questo post.");
+            }
+
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String url = uploadResult.get("secure_url").toString();
+
+            post.setFotoUrl(url);
+            postRepository.save(post);
+
+            return new PostResponse(post);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Errore durante l'upload della foto", e);
+        }
     }
 }

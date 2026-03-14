@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -45,11 +46,7 @@ public class PostController {
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public PostResponse getById(@PathVariable UUID id) {
         Post p = postService.findById(id);
-        return new PostResponse(
-                p.getId(), p.getTitolo(), p.getContenuto(),
-                p.getDataCreazione(), p.getDataModifica(),
-                p.getMonumento().getId(), p.getUtente().getId()
-        );
+        return new PostResponse(p);
     }
 
     // paginazione dei post
@@ -59,9 +56,9 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "dataCreazione") String sortBy
     ) {
-        return postService.getAll(page, size, sortBy);
+        return postService.getAll(page, size, sortBy)
+                .map(PostResponse::new);
     }
-
 
     // modifico il post
     @PutMapping("/{id}")
@@ -76,7 +73,7 @@ public class PostController {
         return postService.update(id, body, utente.getId());
     }
 
-    // elimino il post (lo user può eliminare il post solo se ne è l'autore)
+    // elimino il post
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -86,12 +83,21 @@ public class PostController {
     ) {
         postService.delete(id, utente.getId());
     }
-    
+
+    // tutti i post dell’utente loggato
     @GetMapping("/me")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public List<PostResponse> getMyPosts(@AuthenticationPrincipal Utente utente) {
         return postService.getByUserId(utente.getId());
     }
 
+    @PostMapping("/{id}/foto")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    public PostResponse uploadFoto(
+            @PathVariable UUID id,
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal Utente utente
+    ) {
+        return postService.uploadFoto(id, file, utente.getId());
+    }
 }
-
