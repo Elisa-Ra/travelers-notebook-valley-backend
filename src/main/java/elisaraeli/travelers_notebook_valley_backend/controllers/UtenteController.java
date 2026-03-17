@@ -4,13 +4,16 @@ import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
 import elisaraeli.travelers_notebook_valley_backend.payloads.MedagliaResponse;
 import elisaraeli.travelers_notebook_valley_backend.payloads.PostResponse;
 import elisaraeli.travelers_notebook_valley_backend.payloads.UtenteResponse;
+import elisaraeli.travelers_notebook_valley_backend.payloads.UtenteUpdateDTO;
 import elisaraeli.travelers_notebook_valley_backend.services.ConferitaService;
 import elisaraeli.travelers_notebook_valley_backend.services.PostService;
 import elisaraeli.travelers_notebook_valley_backend.services.UtenteService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -78,4 +81,41 @@ public class UtenteController {
         return conferitaService.getMedaglieByUtente(utente.getId());
     }
 
+    @PutMapping("/me")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    public UtenteResponse updateProfilo(
+            @AuthenticationPrincipal Utente utente,
+            @RequestBody UtenteUpdateDTO body
+    ) {
+        Utente updated = utenteService.updateProfilo(utente.getId(), body);
+
+        return new UtenteResponse(
+                updated.getId(),
+                updated.getUsername(),
+                updated.getEmail(),
+                updated.getAvatar(),
+                updated.getDataRegistrazione(),
+                updated.getRuolo()
+        );
+    }
+
+    // upload avatar
+    @PostMapping(value = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UtenteResponse uploadAvatar(
+            @AuthenticationPrincipal Utente utente,
+            @RequestPart("file") MultipartFile file
+    ) {
+        Utente updated = utenteService.uploadAvatar(utente.getId(), file);
+
+        return new UtenteResponse(
+                updated.getId(),
+                updated.getUsername(),
+                updated.getEmail(),
+                updated.getAvatar(),
+                updated.getDataRegistrazione(),
+                updated.getRuolo()
+        );
+    }
 }
