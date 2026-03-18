@@ -3,6 +3,8 @@ package elisaraeli.travelers_notebook_valley_backend.payloads;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.UUID;
+
 public record MedagliaDTO(
         @NotBlank(message = "Il nome della medaglia è obbligatorio.")
         String nome,
@@ -11,6 +13,8 @@ public record MedagliaDTO(
         String descrizione,
 
         @NotNull
-        String icona
+        String icona,
+     
+        UUID idMonumento
 ) {
 }

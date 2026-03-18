@@ -2,10 +2,7 @@ package elisaraeli.travelers_notebook_valley_backend.services;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import elisaraeli.travelers_notebook_valley_backend.entities.Monumento;
-import elisaraeli.travelers_notebook_valley_backend.entities.Post;
-import elisaraeli.travelers_notebook_valley_backend.entities.Utente;
-import elisaraeli.travelers_notebook_valley_backend.entities.UtenteRuolo;
+import elisaraeli.travelers_notebook_valley_backend.entities.*;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.BadRequestException;
 import elisaraeli.travelers_notebook_valley_backend.exceptions.NotFoundException;
 import elisaraeli.travelers_notebook_valley_backend.payloads.PostDTO;
@@ -32,7 +29,6 @@ public class PostService {
     private final UtenteRepository utenteRepository;
     private final MedagliaRepository medagliaRepository;
     private final ConferitaRepository conferitaRepository;
-    private final ConferitaService conferitaService;
     private final Cloudinary cloudinary;
 
     public PostService(
@@ -41,7 +37,6 @@ public class PostService {
             UtenteRepository utenteRepository,
             MedagliaRepository medagliaRepository,
             ConferitaRepository conferitaRepository,
-            ConferitaService conferitaService,
             Cloudinary cloudinary
     ) {
         this.postRepository = postRepository;
@@ -49,7 +44,6 @@ public class PostService {
         this.utenteRepository = utenteRepository;
         this.medagliaRepository = medagliaRepository;
         this.conferitaRepository = conferitaRepository;
-        this.conferitaService = conferitaService;
         this.cloudinary = cloudinary;
     }
 
@@ -74,7 +68,15 @@ public class PostService {
 
         // ASSEGNO LA MEDAGLIA AUTOMATICAMENTE
         medagliaRepository.findByMonumento_Id(monumento.getId())
-                .ifPresent(medaglia -> conferitaService.assegnaSeNonPresente(medaglia, autore));
+                .ifPresent(medaglia -> {
+
+                    boolean isConferita = conferitaRepository
+                            .existsByUtenteIdAndMedagliaId(autore.getId(), medaglia.getId());
+
+                    if (!isConferita) {
+                        conferitaRepository.save(new Conferita(medaglia, autore));
+                    }
+                });
 
         return new PostResponse(post);
     }

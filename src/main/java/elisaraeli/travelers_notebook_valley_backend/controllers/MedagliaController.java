@@ -95,7 +95,7 @@ public class MedagliaController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public List<MedagliaResponse> getAll() {
         return medagliaService.getAll();
     }

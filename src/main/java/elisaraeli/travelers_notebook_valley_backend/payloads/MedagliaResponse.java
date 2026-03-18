@@ -9,7 +9,5 @@ public record MedagliaResponse(
         String descrizione,
         String icona,
         LocalDate dataConferimento
-
-
 ) {
 }
