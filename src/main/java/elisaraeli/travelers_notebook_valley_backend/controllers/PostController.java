@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -48,6 +49,14 @@ public class PostController {
         Post p = postService.findById(id);
         return new PostResponse(p);
     }
+
+    // prendo i post per monumento
+    @GetMapping("/monumento/{idMonumento}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<PostResponse> getByMonumento(@PathVariable UUID idMonumento) {
+        return postService.getByMonumento(idMonumento);
+    }
+
 
     // paginazione dei post
     @GetMapping
@@ -99,5 +108,12 @@ public class PostController {
             @AuthenticationPrincipal Utente utente
     ) {
         return postService.uploadFoto(id, file, utente.getId());
+    }
+
+    // statistiche dei monumenti (quanti post per monumento)
+    @GetMapping("/stats/monumenti")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<Map<String, Object>> getPostStatsByMonumento() {
+        return postService.countPostsByMonumento();
     }
 }

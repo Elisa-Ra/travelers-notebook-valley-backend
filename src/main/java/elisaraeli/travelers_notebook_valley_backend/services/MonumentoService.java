@@ -37,8 +37,9 @@ public class MonumentoService {
                 .orElseThrow(() -> new NotFoundException(id));
     }
 
+    // Prendo tutti i monumenti e li ordino alfabeticamente
     public List<MonumentoResponse> getAll() {
-        return monumentoRepository.findAll()
+        return monumentoRepository.findAllByOrderByNomeAsc()
                 .stream()
                 .map(m -> new MonumentoResponse(
                         m.getId(),
@@ -93,10 +94,12 @@ public class MonumentoService {
 
         m.setNome(body.nome());
         m.setDescrizione(body.descrizione());
-        m.setFoto(body.foto());
         m.setPosizione(body.posizione());
         m.setCategoria(categoria);
-
+        // se viene caricato il file della foto allora modifico il campo
+        if (body.foto() != null) {
+            m.setFoto(body.foto());
+        }
         monumentoRepository.save(m);
 
         return new MonumentoResponse(
@@ -106,7 +109,6 @@ public class MonumentoService {
                 m.getFoto(),
                 m.getPosizione(),
                 categoria.getCategoria()
-
         );
     }
 

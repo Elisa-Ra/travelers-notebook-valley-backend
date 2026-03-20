@@ -175,4 +175,9 @@ public class PostService {
             throw new RuntimeException("Errore durante l'upload della foto", e);
         }
     }
+
+    // per contare i post per monumento
+    public List<Map<String, Object>> countPostsByMonumento() {
+        return postRepository.countPostsByMonumento();
+    }
 }
