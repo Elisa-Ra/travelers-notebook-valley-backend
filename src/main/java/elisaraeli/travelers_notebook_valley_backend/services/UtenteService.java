@@ -94,7 +94,11 @@ public class UtenteService {
 
         utenteRepository.save(nuovoUtente);
         // assegno la medaglia all'utente per essersi registrato
-        medagliaService.medagliaRegistrazione(nuovoUtente.getId());
+        try {
+            medagliaService.medagliaRegistrazione(nuovoUtente.getId());
+        } catch (Exception e) {
+            System.err.println("La medaglia di benvenuto non è stata assegnata: " + e.getMessage());
+        }
 
 
         return new UtenteResponse(
