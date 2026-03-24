@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -121,6 +123,9 @@ public class UtenteService {
         );
 
         admin.setRuolo(UtenteRuolo.ADMIN);
+        // Avatar di default
+        String safeUsername = URLEncoder.encode(body.username(), StandardCharsets.UTF_8);
+        admin.setAvatar("https://ui-avatars.com/api/?name=" + safeUsername);
 
         return utenteRepository.save(admin);
     }
