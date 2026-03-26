@@ -3,6 +3,8 @@
 # [Frontend](https://github.com/Elisa-Ra/travelers-notebook-valley-frontend)
 
 Backend REST per l’applicazione **Traveller's Notebook Valley Edition**, un diario di viaggio digitale.
+
+
 ** Senza registrazione al sito, l'utente può: **
 - Leggere informazioni culturali 
 ** Con registrazione al sito, l'utente può: **
