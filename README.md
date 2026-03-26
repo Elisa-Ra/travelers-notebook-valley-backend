@@ -74,6 +74,7 @@ Backend REST per l’applicazione **Traveller's Notebook Valley Edition**, un di
   - `security` - Per gestire la sicurezza, i token, la configurazione di CORS, le password ecc...
   - `services` - Contengono CRUD e logica
 
+
 - **Sicurezza:**
   - Configurazione Spring Security con filtro JWT
   - Ruoli/permessi (`UTENTE`, `ADMIN`)
