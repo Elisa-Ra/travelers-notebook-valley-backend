@@ -6,13 +6,17 @@ Backend REST per l’applicazione **Traveller's Notebook Valley Edition**, un di
 
 
 **Senza registrazione al sito, l'utente può:**
-- Leggere informazioni culturali 
+- Leggere informazioni culturali
+
+
 **Con registrazione al sito, l'utente può:**
 - Creare e gestire (CRUD) il suo diario personale, sfogliabile (con flipbook)
 - Scrivere pagine del proprio diario per raccontare pensieri ed esperienze riguardo ai monumenti/punti di interesse visitati
 - Caricare foto nel diario per documentare la loro esperienza
 - Ottenere medaglie/adesivi da sfoggiare nel proprio profilo
 - Gestire e modificare il proprio profilo
+
+  
 **Solo admin**
 - Gestione _categorie_ (es. Monumento, Museo, Mostra, Evento)
 - Gestione _monumenti_/_punti d'interesse_ (es. Tempio della Concordia, Museo Archeologico)
