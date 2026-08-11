@@ -1,5 +1,5 @@
 # Traveler's Notebook Valley Edition - Backend
-# [Link al sito](https://travelers-notebook-valley-frontend.vercel.app/) :woman_technologist:
+
 # [Frontend](https://github.com/Elisa-Ra/travelers-notebook-valley-frontend)
 
 Backend REST per l’applicazione **Traveller's Notebook Valley Edition**, un diario di viaggio digitale.
